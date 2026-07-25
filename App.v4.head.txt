@@ -1,0 +1,37 @@
+﻿import { useState, useMemo, useEffect } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from "recharts";
+import {
+  Trophy, Users, Swords, Star, ChevronRight, Plus, Search, Edit2,
+  Trash2, X, Shield, Award, Calendar,
+  Globe, Menu, LogIn, LayoutDashboard, List, Layers,
+  CheckCircle, Clock, XCircle, Eye, Gamepad2, Zap,
+} from "lucide-react";
+
+// --- API Configuration ---
+const API_URL = "http://localhost:5000/api";
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+type Page = "home" | "players" | "tournaments" | "registrations" | "matches" | "leaderboard" | "dashboard" | "login";
+
+interface Player { player_id: string; username: string; email: string; country: string; rank: string; }
+interface Tournament { tournament_id: string; tournament_name: string; start_date: string; end_date: string; prize_pool: number; status: "upcoming" | "ongoing" | "completed"; }
+interface Registration { registration_id: string; player_id: string; tournament_id: string; registration_date: string; status: "confirmed" | "pending" | "cancelled"; }
+interface Match { match_id: string; tournament_id: string; match_date: string; stage: string; player1_id: string; player2_id: string; character_used: string; rounds_won: string; result: "win" | "loss" | "pending"; }
+interface LeaderboardEntry { lb_id: string; player_id: string; position: number; total_points: number; season: string; }
+
+// ─── Seed Data ──────────────────────────────────────────────────────────────
+
+const INITIAL_PLAYERS: Player[] = [
+  { player_id: "P001", username: "IronFist_Jin", email: "jin@tekken.gg", country: "Japan", rank: "Tekken King" },
+  { player_id: "P002", username: "DevilPunch_Kazuya", email: "kazuya@mishima.jp", country: "Japan", rank: "Tekken God" },
+  { player_id: "P003", username: "RoyalGuard_Nina", email: "nina.w@assassin.eu", country: "Ireland", rank: "Bushin" },
+  { player_id: "P004", username: "SpinKick_Hwoarang", email: "hwoarang@taekwondo.kr", country: "South Korea", rank: "Fujin" },
+  { player_id: "P005", username: "BearClaw_Kuma", email: "kuma@heihachi.jp", country: "Japan", rank: "Warrior" },
+  { player_id: "P006", username: "Dragunov_USSR", email: "sergei@military.ru", country: "Russia", rank: "Tekken Emperor" },
+  { player_id: "P007", username: "LawBreaker_Forest", email: "forest@marshalllaw.us", country: "USA", rank: "Juggernaut" },
+  { player_id: "P008", username: "ElectricWind_Paul", email: "paul.phoenix@usa.com", country: "USA", rank: "Tekken King" },
+];

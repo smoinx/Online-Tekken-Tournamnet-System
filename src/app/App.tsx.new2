@@ -1,0 +1,76 @@
+﻿import { useState, useMemo, useEffect } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from "recharts";
+import {
+  Trophy, Users, Swords, Star, ChevronRight, Plus, Search, Edit2,
+  Trash2, X, Shield, Award, Calendar,
+  Globe, Menu, LogIn, LayoutDashboard, List, Layers,
+  CheckCircle, Clock, XCircle, Eye, Gamepad2, Zap,
+} from "lucide-react";
+
+// --- API Configuration ---
+const API_URL = "http://localhost:5000/api";
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+type Page = "home" | "players" | "tournaments" | "registrations" | "matches" | "leaderboard" | "dashboard" | "login";
+
+interface Player { player_id: string; username: string; email: string; country: string; rank: string; }
+interface Tournament { tournament_id: string; tournament_name: string; start_date: string; end_date: string; prize_pool: number; status: "upcoming" | "ongoing" | "completed"; }
+interface Registration { registration_id: string; player_id: string; tournament_id: string; registration_date: string; status: "confirmed" | "pending" | "cancelled"; }
+interface Match { match_id: string; tournament_id: string; match_date: string; stage: string; player1_id: string; player2_id: string; character_used: string; rounds_won: string; result: "win" | "loss" | "pending"; }
+interface LeaderboardEntry { lb_id: string; player_id: string; position: number; total_points: number; season: string; }
+
+// ─── Seed Data ──────────────────────────────────────────────────────────────
+
+const INITIAL_PLAYERS: Player[] = [
+  { player_id: "P001", username: "IronFist_Jin", email: "jin@tekken.gg", country: "Japan", rank: "Tekken King" },
+  { player_id: "P002", username: "DevilPunch_Kazuya", email: "kazuya@mishima.jp", country: "Japan", rank: "Tekken God" },
+  { player_id: "P003", username: "RoyalGuard_Nina", email: "nina.w@assassin.eu", country: "Ireland", rank: "Bushin" },
+  { player_id: "P004", username: "SpinKick_Hwoarang", email: "hwoarang@taekwondo.kr", country: "South Korea", rank: "Fujin" },
+  { player_id: "P005", username: "BearClaw_Kuma", email: "kuma@heihachi.jp", country: "Japan", rank: "Warrior" },
+  { player_id: "P006", username: "Dragunov_USSR", email: "sergei@military.ru", country: "Russia", rank: "Tekken Emperor" },
+  { player_id: "P007", username: "LawBreaker_Forest", email: "forest@marshalllaw.us", country: "USA", rank: "Juggernaut" },
+  { player_id: "P008", username: "ElectricWind_Paul", email: "paul.phoenix@usa.com", country: "USA", rank: "Tekken King" },
+];
+
+const INITIAL_TOURNAMENTS: Tournament[] = [
+  { tournament_id: "T001", tournament_name: "Iron Fist Championship 2026", start_date: "2026-07-01", end_date: "2026-07-07", prize_pool: 50000, status: "upcoming" },
+  { tournament_id: "T002", tournament_name: "Mishima Zaibatsu Open", start_date: "2026-06-10", end_date: "2026-06-15", prize_pool: 25000, status: "ongoing" },
+  { tournament_id: "T003", tournament_name: "G Corp World Series", start_date: "2026-05-01", end_date: "2026-05-05", prize_pool: 100000, status: "completed" },
+  { tournament_id: "T004", tournament_name: "Tekken 8 Season Finals 2026", start_date: "2026-08-20", end_date: "2026-08-25", prize_pool: 200000, status: "upcoming" },
+  { tournament_id: "T005", tournament_name: "Devil Gene Invitational", start_date: "2026-04-01", end_date: "2026-04-03", prize_pool: 15000, status: "completed" },
+];
+
+const INITIAL_REGISTRATIONS: Registration[] = [
+  { registration_id: "R001", player_id: "P001", tournament_id: "T001", registration_date: "2026-06-01", status: "confirmed" },
+  { registration_id: "R002", player_id: "P002", tournament_id: "T001", registration_date: "2026-06-02", status: "confirmed" },
+  { registration_id: "R003", player_id: "P003", tournament_id: "T002", registration_date: "2026-06-05", status: "pending" },
+  { registration_id: "R004", player_id: "P004", tournament_id: "T002", registration_date: "2026-06-06", status: "confirmed" },
+  { registration_id: "R005", player_id: "P005", tournament_id: "T003", registration_date: "2026-04-20", status: "confirmed" },
+  { registration_id: "R006", player_id: "P006", tournament_id: "T003", registration_date: "2026-04-21", status: "cancelled" },
+  { registration_id: "R007", player_id: "P007", tournament_id: "T004", registration_date: "2026-07-01", status: "pending" },
+  { registration_id: "R008", player_id: "P008", tournament_id: "T001", registration_date: "2026-06-03", status: "confirmed" },
+];
+
+const INITIAL_MATCHES: Match[] = [
+  { match_id: "M001", tournament_id: "T003", match_date: "2026-05-01", stage: "Quarter-Final", player1_id: "P001", player2_id: "P004", character_used: "Jin Kazama", rounds_won: "3-1", result: "win" },   
+  { match_id: "M002", tournament_id: "T003", match_date: "2026-05-02", stage: "Semi-Final", player1_id: "P002", player2_id: "P006", character_used: "Kazuya Mishima", rounds_won: "3-0", result: "win" },  
+  { match_id: "M003", tournament_id: "T003", match_date: "2026-05-05", stage: "Grand Final", player1_id: "P001", player2_id: "P002", character_used: "Jin Kazama", rounds_won: "3-2", result: "win" },     
+  { match_id: "M004", tournament_id: "T002", match_date: "2026-06-12", stage: "Group Stage", player1_id: "P003", player2_id: "P008", character_used: "Nina Williams", rounds_won: "2-3", result: "loss" }, 
+  { match_id: "M005", tournament_id: "T002", match_date: "2026-06-14", stage: "Quarter-Final", player1_id: "P004", player2_id: "P007", character_used: "Hwoarang", rounds_won: "3-1", result: "win" },     
+  { match_id: "M006", tournament_id: "T001", match_date: "2026-07-03", stage: "Group Stage", player1_id: "P001", player2_id: "P008", character_used: "Jin Kazama", rounds_won: "0-0", result: "pending" }, 
+];
+
+const INITIAL_LEADERBOARD: LeaderboardEntry[] = [
+  { lb_id: "L001", player_id: "P002", position: 1, total_points: 9850, season: "Season 3" },
+  { lb_id: "L002", player_id: "P001", position: 2, total_points: 9200, season: "Season 3" },
+  { lb_id: "L003", player_id: "P004", position: 3, total_points: 7800, season: "Season 3" },
+  { lb_id: "L004", player_id: "P006", position: 4, total_points: 6500, season: "Season 3" },
+  { lb_id: "L005", player_id: "P003", position: 5, total_points: 5900, season: "Season 3" },
+  { lb_id: "L006", player_id: "P008", position: 6, total_points: 5100, season: "Season 3" },
+  { lb_id: "L007", player_id: "P007", position: 7, total_points: 4200, season: "Season 3" },
+  { lb_id: "L008", player_id: "P005", position: 8, total_points: 2800, season: "Season 3" },
+];

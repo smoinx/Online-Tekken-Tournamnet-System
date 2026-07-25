@@ -1,0 +1,26 @@
+﻿import { useState, useMemo, useEffect } from "react";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+} from "recharts";
+import {
+  Trophy, Users, Swords, Star, ChevronRight, Plus, Search, Edit2,
+  Trash2, X, Shield, Award, Calendar,
+  Globe, Menu, LogIn, LayoutDashboard, List, Layers,
+  CheckCircle, Clock, XCircle, Eye, Gamepad2, Zap,
+} from "lucide-react";
+
+// --- API Configuration ---
+const API_URL = "http://localhost:5000/api";
+
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+type Page = "home" | "players" | "tournaments" | "registrations" | "matches" | "leaderboard" | "dashboard" | "login";
+
+interface Player { player_id: string; username: string; email: string; country: string; rank: string; }
+interface Tournament { tournament_id: string; tournament_name: string; start_date: string; end_date: string; prize_pool: number; status: "upcoming" | "ongoing" | "completed"; }
+interface Registration { registration_id: string; player_id: string; tournament_id: string; registration_date: string; status: "confirmed" | "pending" | "cancelled"; }
+interface Match { match_id: string; tournament_id: string; match_date: string; stage: string; player1_id: string; player2_id: string; character_used: string; rounds_won: string; result: "win" | "loss" | "pending"; }
+interface LeaderboardEntry { lb_id: string; player_id: string; position: number; total_points: number; season: string; }
+
+// ─── Seed Data ──────────────────────────────────────────────────────────────

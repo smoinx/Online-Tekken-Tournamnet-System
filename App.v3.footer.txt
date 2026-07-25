@@ -1,0 +1,14 @@
+﻿      <main className="pt-16">
+        {page === "home" && <HomePage players={players} tournaments={tournaments} matches={matches} setPage={setPage} />}
+        {page === "players" && <PlayersPage players={players} setPlayers={setPlayers} />}
+        {page === "tournaments" && <TournamentsPage tournaments={tournaments} setTournaments={setTournaments} />}
+        {page === "registrations" && <RegistrationsPage registrations={registrations} setRegistrations={setRegistrations} players={players} tournaments={tournaments} />}
+        {page === "matches" && <MatchesPage matches={matches} setMatches={setMatches} players={players} tournaments={tournaments} />}
+        {page === "leaderboard" && <LeaderboardPage leaderboard={leaderboard} players={players} />}
+        {page === "dashboard" && <DashboardPage players={players} tournaments={tournaments} matches={matches} registrations={registrations} leaderboard={leaderboard} />}
+        {page === "login" && <LoginPage setPage={setPage} />}
+      </main>
+      {page !== "login" && <Footer />}
+    </div>
+  );
+}
