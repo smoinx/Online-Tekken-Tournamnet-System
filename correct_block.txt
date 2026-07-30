@@ -1,9 +1,0 @@
-﻿  useEffect(() => {
-    fetch(API_URL + "/players").then(res => res.json()).then(setPlayers);
-    fetch(API_URL + "/tournaments").then(res => res.json()).then(setTournaments);
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-background font-['Inter'] text-foreground" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(0,180,255,0.2) transparent' }}>
-      <Nav page={page} setPage={setPage} />
-      <main className="pt-16">
