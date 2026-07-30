@@ -1,5 +1,0 @@
-﻿  const [players, setPlayers] = useState<Player[]>(INITIAL_PLAYERS);
-  const [tournaments, setTournaments] = useState<Tournament[]>(INITIAL_TOURNAMENTS);
-  const [registrations, setRegistrations] = useState<Registration[]>(INITIAL_REGISTRATIONS);
-  const [matches, setMatches] = useState<Match[]>(INITIAL_MATCHES);
-  const leaderboard = INITIAL_LEADERBOARD;
