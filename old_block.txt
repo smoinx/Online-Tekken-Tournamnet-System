@@ -1,5 +1,0 @@
-﻿  useEffect(() => {
-    fetch(API_URL + "/players").then(res => res.json()).then(setPlayers);
-    fetch(API_URL + "/tournaments").then(res => res.json()).then(setTournaments);
-  }, []);
-      <main className="pt-16">
